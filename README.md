@@ -6,7 +6,7 @@ It is using Smack client to connect to Drawers. It is a simple echo bot which re
 Install maven - sudo-apt get install maven for Ubuntu. For other platform and in general  -https://maven.apache.org/install.html
 ```
 1. mvn install.
-2. Update your username and pwd in BotCalle.
+2. Update your username and pwd in BotCaller.
 3. mvn clean package.
 4. Go to target and run the fat jar using java -jar. 
 ```
