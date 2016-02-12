@@ -3,6 +3,7 @@
 
 It is using Smack client to connect to Drawers. It is a simple echo bot which returns bot says. Replace it with your custom logic. Just override generatesreply in BotCaller. 
 
+Install maven - sudo-apt get install maven.
 ```
 1. mvn install.
 2. mvn clean package.
