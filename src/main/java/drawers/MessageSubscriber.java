@@ -1,9 +1,6 @@
-package dictionary.bot;
-
-import org.jivesoftware.smack.packet.Message;
+package drawers;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
 /**
  * Created by harshit on 30/1/16.
@@ -11,7 +8,7 @@ import java.net.URLDecoder;
 public interface MessageSubscriber {
     /**
      * @return String
-     * This text is shown when {@link #generateReply(Message)} message throws exception.
+     * This text is shown when {@link #generateReply(String)} message throws exception.
      */
     String getErrorDefaultText();
 
@@ -22,5 +19,5 @@ public interface MessageSubscriber {
      * This function takes the input message,
      * makes the computation and return the relevant reply.
      */
-    String generateReply(Message message) throws UnsupportedEncodingException;
+    String generateReply(String message) throws UnsupportedEncodingException;
 }

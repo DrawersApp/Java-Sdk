@@ -1,4 +1,4 @@
-package dictionary.bot;
+package drawers;
 
 /**
  * Created by harshit on 20/1/16.
