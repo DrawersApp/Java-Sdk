@@ -1,5 +1,7 @@
 package drawers
 
+import java.util.concurrent.TimeUnit
+
 /**
  * Created by nishant.pathak on 04/04/16.
  */
@@ -7,9 +9,6 @@ package drawers
 
 fun main(args: Array<String>) {
     val botsCaller = Subscriber()
-    Bot.getBot(botsCaller, "uname", "pwd")
-    while (true) {
-        Thread.sleep(1000000000000L)
-    }
-
+    val bot = Bot.getBot(botsCaller, "uname", "pwd")
+    bot.executorService.awaitTermination(1000000000000L, TimeUnit.DAYS)
 }

@@ -15,7 +15,14 @@ data class MqttChatMessage(@SerializedName("i") public val messageId: String,
                              ) {
     companion object {
         val gson: Gson = Gson()
-        fun fromString(data: String): MqttChatMessage = gson.fromJson(data, MqttChatMessage::class.java)
+        fun fromString(data: String): MqttChatMessage? {
+            try {
+                return gson.fromJson(data, MqttChatMessage::class.java)
+            } catch(e: Exception) {
+                throw e
+            }
+            return null
+        }
         fun toJson(data: MqttChatMessage): String = gson.toJson(data)
     }
 }
