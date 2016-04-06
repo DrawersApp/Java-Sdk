@@ -79,15 +79,16 @@ public class Bot implements MqttCallback {
 
     private void replyMessage(String topic, MqttMessage message) {
         try {
-            DrawersCryptoEngineImpl cryptoEngine = new DrawersCryptoEngineImpl();
             String decryptedMessage = new String(cryptoEngine.aesDecrypt(KEY, null, message.getPayload()));
-            MqttChatMessage chatMessage = MqttChatMessage.Companion.fromString(String.valueOf(decryptedMessage));
+            MqttChatMessage chatMessage = MqttChatMessage.fromString(String.valueOf(decryptedMessage));
             String replyMessage = messageSubscriber.generateReply(chatMessage.getMessage());
             sendMessage(chatMessage.getSenderUid(), replyMessage);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    private final DrawersCryptoEngineImpl cryptoEngine = new DrawersCryptoEngineImpl();
 
     /**
      * @param uid
@@ -96,10 +97,9 @@ public class Bot implements MqttCallback {
     private void sendMessage(String uid, String reply) {
         try {
             MqttChatMessage chatMessage = new MqttChatMessage(UUID.randomUUID().toString(), reply,
-                    mqttAsyncClient.getClientId(), ChatConstant.TEXT.toString(), false);
+                    mqttAsyncClient.getClientId(), ChatConstant.ChatType.TEXT, false);
 
-            DrawersCryptoEngineImpl cryptoEngine = new DrawersCryptoEngineImpl();
-            String encryptedMessage = new String(cryptoEngine.aesEncrypt(KEY, null, MqttChatMessage.Companion.toJson(chatMessage).getBytes()));
+            String encryptedMessage = new String(cryptoEngine.aesEncrypt(KEY, null, MqttChatMessage.toJson(chatMessage).getBytes()));
 
             MqttMessage message = new MqttMessage(encryptedMessage.getBytes());
             message.setQos(1);
