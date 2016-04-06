@@ -2,22 +2,20 @@ package drawers;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-import lombok.NonNull;
 
 /**
  * Created by nishant.pathak on 06/04/16.
  */
 public class MqttChatMessage {
 
-    @NonNull
     @SerializedName("i")
     private String messageId;
-    @NonNull @SerializedName("m")
+    @SerializedName("m")
     private String message;
-    @NonNull @SerializedName("s")
+    @SerializedName("s")
     private String senderUid;
 
-    @NonNull @SerializedName("c")
+    @SerializedName("c")
     private ChatConstant.ChatType chatType;
     @SerializedName("d")
     private boolean deliveryReceipt;
@@ -30,7 +28,7 @@ public class MqttChatMessage {
         return message;
     }
 
-    public MqttChatMessage(@NonNull String messageId, @NonNull String message, @NonNull String senderUid, @NonNull ChatConstant.ChatType chatType, boolean deliveryReceipt) {
+    public MqttChatMessage( String messageId, String message, String senderUid, ChatConstant.ChatType chatType, boolean deliveryReceipt) {
         this.messageId = messageId;
         this.message = message;
         this.senderUid = senderUid;
