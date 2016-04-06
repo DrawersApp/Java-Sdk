@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 
 /**
  * Main bot class contains the logic for incoming and reply message.
+ *
  * @author harshit
  * @author nishant.pathak
  * @version 2.0.0
@@ -45,35 +46,35 @@ public class Bot implements MqttCallback {
      * Building the connection with stream resumption.
      * Stream resumption allows for quick reconnect for flaky networks.
      * Listening for incoming message and dispatching to message subscriber using thread pool of size 5.
-     * @see  <a href="http://xmpp.org/extensions/xep-0198.html">http://xmpp.org/extensions/xep-0198.html</a>
+     *
      * @throws MqttException
+     * @see <a href="http://xmpp.org/extensions/xep-0198.html">http://xmpp.org/extensions/xep-0198.html</a>
      */
 
 
     final private String clientId = "09676880-82c2-4e85-9d69-a979f4bf5ebe";
-
+    private ConnectionListener listener;
     public void initializeConnection() throws MqttException {
         mqttAsyncClient = new MqttAsyncClient("tcp://mqtt-lb.sandwitch.in:80", clientId);
+        listener = new ConnectionListener(mqttAsyncClient, clientId);
         mqttAsyncClient.setCallback(Bot.this);
         MqttConnectOptions connectOptions = new MqttConnectOptions();
         connectOptions.setCleanSession(false);
         connectOptions.setConnectionTimeout(15000);
         connectOptions.setKeepAliveInterval(120);
-        mqttAsyncClient.connect(connectOptions, null, new ConnectionListener(mqttAsyncClient, clientId));
+        mqttAsyncClient.connect(connectOptions, null, listener);
     }
 
 
     // TODO: implement session based encryption decryption
-    public static final byte[] KEY = new byte[] { 0x44, 0x52, 0x41, 0x57,
+    public static final byte[] KEY = new byte[]{0x44, 0x52, 0x41, 0x57,
             0x45, 0x52, 0x53, 0x52, 0x45, 0x57, 0x41, 0x52, 0x44, 0x00, 0x00,
-            0x00 };
+            0x00};
 
 
     /**
-     *
-     * @param message
-     * Generates the message from subscriber and propogate to {@link #sendMessage(String, String)}.
-     * Also check for error conditions.
+     * @param message Generates the message from subscriber and propogate to {@link #sendMessage(String, String)}.
+     *                Also check for error conditions.
      */
 
     private void replyMessage(String topic, MqttMessage message) {
@@ -89,15 +90,13 @@ public class Bot implements MqttCallback {
     }
 
     /**
-     *
      * @param uid
-     * @param reply
-     * Publish the actual message.
+     * @param reply Publish the actual message.
      */
     private void sendMessage(String uid, String reply) {
         try {
             MqttChatMessage chatMessage = new MqttChatMessage(UUID.randomUUID().toString(), reply,
-                    mqttAsyncClient.getClientId(),ChatConstant.TEXT.toString() , false);
+                    mqttAsyncClient.getClientId(), ChatConstant.TEXT.toString(), false);
 
             DrawersCryptoEngineImpl cryptoEngine = new DrawersCryptoEngineImpl();
             String encryptedMessage = new String(cryptoEngine.aesEncrypt(KEY, null, MqttChatMessage.Companion.toJson(chatMessage).getBytes()));
@@ -116,6 +115,7 @@ public class Bot implements MqttCallback {
     static boolean tryAgain = true;
 
     private final Object syncObj = new Object();
+
     @Override
     public void connectionLost(Throwable cause) {
         System.out.println("Connection Lost");
@@ -124,25 +124,7 @@ public class Bot implements MqttCallback {
         synchronized (syncObj) {
             while (tryAgain) {
                 try {
-                    mqttAsyncClient.connect(null, new IMqttActionListener() {
-                        @Override
-                        public void onSuccess(IMqttToken asyncActionToken) {
-                            System.out.println("connected successfully");
-                            tryAgain = false;
-                            try {
-                                mqttAsyncClient.subscribe(clientId + Bot.NAMESPACE, 1);
-                            } catch (MqttException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                        @Override
-                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                            tryAgain = true;
-                            System.out.println("failed");
-                        }
-                    });
+                    mqttAsyncClient.connect(null, listener);
                 } catch (Exception e) {
                     e.printStackTrace();
                     try {
